@@ -18,8 +18,9 @@ jobs:
       uses: Jimver/cuda-toolkit@v0.2.8 
     
     - name: build
-      run:  cmake
+      run:  cmake -B Gpufit-build/
       
     - name: make
-      run:  make
+      run:  cd Gpufit-build/  |
+            make
 
