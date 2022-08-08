@@ -19,8 +19,6 @@ jobs:
     
     - name: build
       run:  whoami  |
-            cmake -B Gpufit-build/
-      
-    - name: make
-      run:  cd Gpufit/Gpufit-build/  |
+            cmake -B Gpufit-build/  |
+            cd Gpufit-build/  |
             make
