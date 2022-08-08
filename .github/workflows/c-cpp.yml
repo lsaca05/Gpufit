@@ -22,6 +22,7 @@ jobs:
             cmake -B ../Gpufit-build/
       
     - name: make
-      run: cd ../Gpufit-build/ |
+      run:  ls  |
+            cd Gpufit-build/ |
             make
 
