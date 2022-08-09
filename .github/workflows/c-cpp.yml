@@ -16,10 +16,16 @@ jobs:
     
     - name: cuda-toolkit
       uses: Jimver/cuda-toolkit@v0.2.8 
-    
+
+    - name: Build Boost
+      uses: egor-tensin/build-boost@v1
+
     - name: build
       run:  whoami  |
             cmake -S . -B Gpufit-build/ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
             
     - name: make
       run:  cmake --build Gpufit-build/ --target all
+
+    - name: misc
+      run:  ./Gpufit-build/Gpufit_Cpufit_Performance_Comparison
