@@ -14,11 +14,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Download and install Boost
+      uses: MarkusJx/install-boost@v2.3.0
+
     - name: cuda-toolkit
       uses: Jimver/cuda-toolkit@v0.2.8 
-
-    - name: Build Boost
-      uses: egor-tensin/build-boost@v1
 
     - name: build
       run:  whoami  |
