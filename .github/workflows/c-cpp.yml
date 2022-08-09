@@ -19,8 +19,7 @@ jobs:
     
     - name: build
       run:  whoami  |
-            cmake -B Gpufit-build/
+            cmake -S . -B Gpufit-build/ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
             
     - name: make
-      run:  cd Gpufit-build/  |
-            make
+      run:  cmake --build Gpufit-build/ --target all
