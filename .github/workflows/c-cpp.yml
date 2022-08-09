@@ -43,3 +43,11 @@ jobs:
 
     - name: misc
       run:  ./Gpufit-build/Gpufit_Cpufit_Performance_Comparison
+    
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Test an .exe
+        run:  ./Gpufit-build/Gpufit_Cpufit_Performance_Comparison
