@@ -22,15 +22,16 @@ jobs:
           # A list of supported versions can be found here: 
           # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
         boost_version: 1.73.0
-#           # OPTIONAL: Specify a platform version
-#           platform_version: 22.04
+        # OPTIONAL: Specify a platform version
+        platform_version: 22.04
 #           # OPTIONAL: Specify a toolset
 #           toolset: gcc
-#           # OPTIONAL: Specify an architecture
-#           arch: x86
+        # OPTIONAL: Specify an architecture
+        arch: x86
     
     # NOTE: If a boost version matching all requirements cannot be found,
     # this build step will fail
+    
     - name: cuda-toolkit
       uses: Jimver/cuda-toolkit@v0.2.8 
 
@@ -41,10 +42,5 @@ jobs:
     - name: make
       run:  cmake --build Gpufit-build/ --target all
 
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    
-    steps:
-      - name: Test an .exe
-        run:  ./Gpufit-build/Gpufit_Cpufit_Performance_Comparison
+    - name: test
+      run:  ./Gpufit-build/Gpufit_Cpufit_Performance_Comparison
