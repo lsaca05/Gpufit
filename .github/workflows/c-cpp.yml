@@ -42,7 +42,6 @@ jobs:
             
     - name: make
       run:  cmake --build Gpufit-build/ --target all
-            cd Gpufit-build/
 
     - name: Performance test
       run:  cd Gpufit-build/  |
