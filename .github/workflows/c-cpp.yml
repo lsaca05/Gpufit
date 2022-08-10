@@ -49,6 +49,7 @@ jobs:
             ./Gpufit_Cpufit_Patlak
       working-directory: Gpufit-build/
 
-    - name: Boost tests
-      run:  ./test_all.sh
-      working-directory: Gpufit-build/
+    #   uncomment once runner has a GPU 
+    # - name: Boost tests
+    #   run:  ./test_all.sh
+    #   working-directory: Gpufit-build/
