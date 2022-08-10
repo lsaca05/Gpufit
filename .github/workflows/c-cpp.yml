@@ -43,10 +43,12 @@ jobs:
     - name: make
       run:  cmake --build Gpufit-build/ --target all
 
-    - name: Performance test
+    - name: Performance tests
       run:  |
-            cd Gpufit-build/  
             ./Gpufit_Cpufit_Performance_Comparison
+            ./Gpufit_Cpufit_Patlak
+      working-directory: Gpufit-build/
 
     - name: Boost tests
       run:  ./test_all.sh
+      working-directory: Gpufit-build/
