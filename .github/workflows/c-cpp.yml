@@ -35,12 +35,16 @@ jobs:
     - name: cuda-toolkit
       uses: Jimver/cuda-toolkit@v0.2.8 
 
-    - name: build
-      run:  whoami  |
-            cmake -S . -B Gpufit-build/ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/boost/boost-1.73.0-ubuntu-18.04
+    - name: Build with CMake
+      run:  cmake -S . -B Gpufit-build/ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
             
     - name: make
       run:  cmake --build Gpufit-build/ --target all
 
     - name: Performance test
       run:  ./Gpufit-build/Gpufit_Cpufit_Performance_Comparison
+
+    - name: Boost tests
+      run:  ./Gpufit-build/test_all.sh
