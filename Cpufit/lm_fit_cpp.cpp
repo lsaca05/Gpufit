@@ -6,7 +6,6 @@
 #include <numeric>
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 // TODO if std::size_t and int are not the same, we will get lots of C26451 warnings here related to it, they can be ignored or
 // int should be converted to size_t but be careful, there is at least one for loop that checks for >=0 which only works with int that way

@@ -23,7 +23,7 @@
         std::cout << "CUBLAS enabled: No" << std::endl << std::endl
 #endif // USE_CUBLAS
 
-
+// consider condensing main into functions
 
 /*
     Names of parameters for the Patlak model
@@ -93,107 +93,6 @@ void generate_test_parameters(std::vector<Parameters> & target, Parameters const
     for (int i = 0; i < progress_width; i++)
         std::cout << "-";
     std::cout << std::endl;
-}
-
-/*
-
-*/
-// void add_gauss_noise(std::vector<REAL> & vec, Parameters const & parameters, REAL const snr)
-// {
-//     REAL const fit_area = gauss_fwtm*gauss_fwtm;
-
-//     REAL const mean_Ktrans = 2 * REAL(M_PI) * parameters.Ktrans * parameters.width * parameters.width / fit_area;
-
-//     REAL const std_dev = mean_Ktrans / snr;
-
-//     std::normal_distribution<REAL> distribution(0, std_dev);
-
-//     int const text_width = 30;
-//     int const progress_width = 25;
-
-//     std::cout << std::setw(text_width) << " ";
-//     for (int i = 0; i < progress_width; i++)
-//         std::cout << "-";
-//     std::cout << std::endl;
-//     std::cout << std::setw(text_width) << std::left << "Adding noise";
-
-//     std::size_t progress = 0;
-
-//     for (std::size_t i = 0; i < vec.size(); i++)
-//     {
-//         vec[i] += distribution(rng);
-
-//         progress += 1;
-//         if (progress >= vec.size() / progress_width)
-//         {
-//             progress = 0;
-//             std::cout << "|";
-//         }
-//     }
-
-//     std::cout << std::endl;
-//     std::cout << std::setw(text_width) << " ";
-//     for (int i = 0; i < progress_width; i++)
-//         std::cout << "-";
-//     std::cout << std::endl;
-// }
-
-/*
-
-*/
-void generate_patlak(
-    std::size_t const n_fits,
-    std::size_t const n_points,
-    std::vector<REAL> & data,
-    std::vector<Parameters> const & parameters,
-    std::vector<REAL> user_info)
-{
-    // int const text_width = 30;
-    // int const progress_width = 25;
-
-    // std::cout << std::setw(text_width) << " ";
-    // for (int i = 0; i < progress_width; i++)
-    //     std::cout << "-";
-    // std::cout << std::endl;
-    // std::cout << std::setw(text_width) << std::left << "Generating data";
-
-    // std::size_t progress = 0;
-
-    // for (std::size_t i = 0; i < n_fits; i++)
-    // {
-    //     REAL const Ktrans = parameters[i].Ktrans;
-    //     REAL const vp = parameters[i].vp;
-
-    //     std::size_t const fit_index = i * n_points;
-
-    //     for (int iy = 0; iy < sqrt(n_points); iy++)
-    //     {
-    //         for (int ix = 0; ix < sqrt(n_points); ix++)
-    //         {
-    //             std::size_t const point_index = iy * std::size_t(sqrt(n_points)) + ix;
-    //             std::size_t const absolute_index = fit_index + point_index;
-
-    //             REAL const argx
-    //                 = exp(-0.5f * ((ix - vp) / width) * ((ix - vp) / width));
-    //             REAL const argy
-    //                 = exp(-0.5f * ((iy - y00) / width) * ((iy - y00) / width));
-
-    //             data[absolute_index] = Ktrans * argx * argy + background;
-    //         }
-    //     }
-
-    //     progress += 1;
-    //     if (progress >= n_fits / progress_width)
-    //     {
-    //         progress = 0;
-    //         std::cout << "|";
-    //     }
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::setw(text_width) << " ";
-    // for (int i = 0; i < progress_width; i++)
-    //     std::cout << "-";
-    // std::cout << std::endl;
 }
 
 /*
