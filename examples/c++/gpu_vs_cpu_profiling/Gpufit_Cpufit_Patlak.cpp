@@ -213,7 +213,7 @@ int main(int argc, char * argv[])
     //  test data
     std::vector<REAL> user_info(n_parameters * n_points);
     std::vector<REAL> data(max_n_fits * n_points);
-    generate_patlak(max_n_fits, n_points, data, test_parameters, user_info);
+    // generate_patlak(max_n_fits, n_points, data, test_parameters, user_info);
     // custom x positions for the data points of every fit, stored in user info
 	// time independent variable, given in minutes
 	REAL timeX[] = { 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5,
