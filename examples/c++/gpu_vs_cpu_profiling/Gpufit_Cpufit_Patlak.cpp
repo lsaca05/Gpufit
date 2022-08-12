@@ -276,26 +276,29 @@ int main(int argc, char * argv[])
     generate_initial_parameters(initial_parameters, test_parameters);
 
     // print column identifiers
-    std::cout << "Delta values are GPU - CPU.\n";
+    std::cout << "Delta values are GPU mean - CPU mean.\n";
     std::cout << std::endl << std::right;
     std::cout << std::setw(8) << "Number" << std::setw(3) << "|";
-    std::cout << std::setw(13) << "Cpufit speed" << std::setw(3) << "|";
-    std::cout << std::setw(13) << "Gpufit speed" << std::setw(3) << "|";
-    std::cout << std::setw(12) << "Performance" << std::setw(3) << "|";
+    std::cout << std::setw(9) << "Cpufit" << std::setw(3) << "|";
+    std::cout << std::setw(9) << "Gpufit" << std::setw(3) << "|";
+    std::cout << std::setw(9) << "Perf gain" << std::setw(2) << "|";
     for (int i = 0; i < n_parameters; i++)
         std::cout << std::setw(12) << "Delta Param" << i << std::setw(3) << "|";
     std::cout << std::setw(13) << "Delta Chi Sq" << std::setw(3) << "|";
-    std::cout << std::setw(13) << "Delta n Iter";
+    std::cout << std::setw(13) << "Delta n Iter" << std::setw(3) << "|";
+    std::cout << std::setw(13) << "Converge";
     std::cout << std::endl;
     std::cout << std::setw(8) << "of fits" << std::setw(3) << "|";
-    std::cout << std::setw(13) << "(fits/s)" << std::setw(3) << "|";
-    std::cout << std::setw(13) << "(fits/s)" << std::setw(3) << "|";
-    std::cout << std::setw(12) << "gain factor" << std::setw(3) << "|";
+    std::cout << std::setw(10) << "(fits/s)" << std::setw(2) << "|";
+    std::cout << std::setw(10) << "(fits/s)" << std::setw(2) << "|";
+    std::cout << std::setw(9) << "factor" << std::setw(2) << "|";
     // for (int i = 0; i < n_parameters; i++)
     //     std::cout << std::setw(16) << "|";
     std::cout << std::setw(10) << "Ktrans" << std::setw(6) << "|";
     std::cout << std::setw(9) << "vp" << std::setw(7) << "|";
     std::cout << std::setw(16) << "|";
+    std::cout << std::setw(16) << "|";
+    std::cout << std::setw(13) << " Ratio (CPU GPU)";
     std::cout << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------------------------------------------------------------------";
     std::cout << std::endl;
@@ -517,26 +520,28 @@ int main(int argc, char * argv[])
         std::cout << std::fixed << std::setprecision(0);
         if (dt_cpufit)
         {
-            std::cout << std::setw(13) << static_cast<double>(n_fits) / static_cast<double>(dt_cpufit)* 1000.0 << std::setw(3) << "|";
+            std::cout << std::setw(9) << static_cast<double>(n_fits) / static_cast<double>(dt_cpufit)* 1000.0 << std::setw(3) << "|";
         }
         else
         {
-            std::cout << std::setw(13) << "inf" << std::setw(3) << "|";
+            std::cout << std::setw(9) << "inf" << std::setw(3) << "|";
         }
         if (dt_gpufit)
         {
-            std::cout << std::setw(13) << static_cast<double>(n_fits) / static_cast<double>(dt_gpufit)* 1000.0 << std::setw(3) << "|";
+            std::cout << std::setw(9) << static_cast<double>(n_fits) / static_cast<double>(dt_gpufit)* 1000.0 << std::setw(3) << "|";
             std::cout << std::fixed << std::setprecision(2);
-            std::cout << std::setw(12) << static_cast<double>(dt_cpufit) / static_cast<double>(dt_gpufit) << std::setw(3) << "|";
+            std::cout << std::setw(8) << static_cast<double>(dt_cpufit) / static_cast<double>(dt_gpufit) << std::setw(3) << "|";
             std::cout << std::fixed << std::setprecision(9);
             // for (int i = 0; i < n_parameters; i++)
             //     std::cout << std::setw(13) << *(gpufit_parameters.data()+fit_index*n_parameters+i)-*(cpufit_parameters.data()+fit_index*n_parameters+i) << std::setw(3) << "|";
             for (int i = 0; i < n_parameters; i++)
-                std::cout << std::setw(13) << gpu_output_parameters_mean[i]-cpu_output_parameters_mean[i] << " m " << gpu_output_parameters_std[i]-cpu_output_parameters_std[i] << " sd " << std::setw(3) << "|";
+                std::cout << std::setw(13) << gpu_output_parameters_mean[i]-cpu_output_parameters_mean[i] << std::setw(3) << "|";
             // std::cout << std::setw(13) << *(gpufit_chi_squares.data()+fit_index)-*(cpufit_chi_squares.data()+fit_index) << std::setw(3) << "|";
             // std::cout << std::setw(7) << *(gpufit_n_iterations.data()+fit_index)-*(cpufit_n_iterations.data()+fit_index);
             std::cout << std::setw(13) << gpu_output_chi_square_mean-cpu_output_chi_square_mean << std::setw(3) << "|";
-            std::cout << std::setw(7) << gpu_output_number_iterations_mean-cpu_output_number_iterations_mean;
+            std::cout << std::setw(13) << gpu_output_number_iterations_mean-cpu_output_number_iterations_mean << std::setw(3) << "|";
+            std::cout << std::setw(12) << (REAL)cpu_output_states_histogram[0] / n_fits << std::setw(3);
+            std::cout << std::setw(12) << (REAL)gpu_output_states_histogram[0] / n_fits;
         }
         else if (!do_gpufits)
         {
@@ -545,13 +550,15 @@ int main(int argc, char * argv[])
         }
         else
         {
-            std::cout << std::setw(13) << "inf" << std::setw(3) << "|";
-            std::cout << std::setw(12) << "inf" << std::setw(3) << "|";
+            std::cout << std::setw(9) << "inf" << std::setw(3) << "|";
+            std::cout << std::setw(8) << "inf" << std::setw(3) << "|";
             std::cout << std::fixed << std::setprecision(9);
             for (int i = 0; i < n_parameters; i++)
-                std::cout << std::setw(13) << gpu_output_parameters_mean[i]-cpu_output_parameters_mean[i] << " m " << gpu_output_parameters_std[i]-cpu_output_parameters_std[i] << " sd " << std::setw(3) << "|";
+                std::cout << std::setw(13) << gpu_output_parameters_mean[i]-cpu_output_parameters_mean[i] << std::setw(3) << "|";
             std::cout << std::setw(13) << gpu_output_chi_square_mean-cpu_output_chi_square_mean << std::setw(3) << "|";
-            std::cout << std::setw(7) << gpu_output_number_iterations_mean-cpu_output_number_iterations_mean;
+            std::cout << std::setw(13) << gpu_output_number_iterations_mean-cpu_output_number_iterations_mean << std::setw(3) << "|";
+            std::cout << std::setw(12) << (REAL)cpu_output_states_histogram[0] / n_fits << std::setw(3);
+            std::cout << std::setw(12) << (REAL)gpu_output_states_histogram[0] / n_fits;
         }
         
         std::cout << std::endl;        
