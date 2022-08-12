@@ -409,10 +409,10 @@ int main(int argc, char * argv[])
         // std::cout << "ratio gpu not read           " << (REAL)gpu_output_states_histogram[4] / n_fits << "\n";
 
         // compute mean fitted parameters for converged fits
-        std::vector< REAL > cpu_output_parameters_mean(n_parameters, 0);
-        std::vector< REAL > cpu_output_parameters_mean_error(n_parameters, 0);
-        std::vector< REAL > gpu_output_parameters_mean(n_parameters, 0);
-        std::vector< REAL > gpu_output_parameters_mean_error(n_parameters, 0);
+        std::vector< double > cpu_output_parameters_mean(n_parameters, 0);
+        std::vector< double > cpu_output_parameters_mean_error(n_parameters, 0);
+        std::vector< double > gpu_output_parameters_mean(n_parameters, 0);
+        std::vector< double > gpu_output_parameters_mean_error(n_parameters, 0);
         for (size_t i = 0; i != n_fits; i++)
         {
             if (cpufit_states[i] == FitState::CONVERGED)
@@ -445,8 +445,8 @@ int main(int argc, char * argv[])
         gpu_output_parameters_mean[1] /= gpu_output_states_histogram[0];
 
         // compute std of fitted parameters for converged fits
-        std::vector< REAL > cpu_output_parameters_std(n_parameters, 0);
-        std::vector< REAL > gpu_output_parameters_std(n_parameters, 0);
+        std::vector< double > cpu_output_parameters_std(n_parameters, 0);
+        std::vector< double > gpu_output_parameters_std(n_parameters, 0);
         for (size_t i = 0; i != n_fits; i++)
         {
             if (cpufit_states[i] == FitState::CONVERGED)
@@ -476,8 +476,8 @@ int main(int argc, char * argv[])
         // std::cout << "vp	true " << true_parameters[1] << " mean " << output_parameters_mean[1] << " std " << output_parameters_std[1] << "\n";
 
         // compute mean chi-square for those converged
-        REAL  cpu_output_chi_square_mean = 0;
-        REAL  gpu_output_chi_square_mean = 0;
+        double cpu_output_chi_square_mean = 0;
+        double gpu_output_chi_square_mean = 0;
         for (size_t i = 0; i != n_fits; i++)
         {
             if (cpufit_states[i] == FitState::CONVERGED)
@@ -493,8 +493,8 @@ int main(int argc, char * argv[])
         // std::cout << "mean chi square " << cpu_output_chi_square_mean << "\n";
 
         // compute mean number of iterations for those converged
-        REAL  cpu_output_number_iterations_mean = 0;
-        REAL  gpu_output_number_iterations_mean = 0;
+        double cpu_output_number_iterations_mean = 0;
+        double gpu_output_number_iterations_mean = 0;
         for (size_t i = 0; i != n_fits; i++)
         {
             if (cpufit_states[i] == FitState::CONVERGED)
