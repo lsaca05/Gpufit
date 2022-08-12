@@ -197,7 +197,7 @@ int main(int argc, char * argv[])
     std::size_t const n_parameters = 2;
     std::vector<int> parameters_to_fit(n_parameters, 1);
     REAL const tolerance = 0.0001f;
-    int const max_n_iterations = 10;
+    int const max_n_iterations = 200;
     const REAL snr = 0.8;
 
     // initial parameters
@@ -385,6 +385,133 @@ int main(int argc, char * argv[])
                 do_gpufits = false;
             }
         }
+        // get fit states
+        std::vector< int > cpu_output_states_histogram(5, 0);
+        std::vector< int > gpu_output_states_histogram(5, 0);
+        for (std::vector< int >::iterator it = cpufit_states.begin(); it != cpufit_states.end(); ++it)
+        {
+            cpu_output_states_histogram[*it]++;
+        }
+        for (std::vector< int >::iterator it = gpufit_states.begin(); it != gpufit_states.end(); ++it)
+        {
+            gpu_output_states_histogram[*it]++;
+        }
+        // std::cout << "CPU ratio converged          " << (REAL)cpu_output_states_histogram[0] / n_fits << "\n";
+        // std::cout << "ratio max iteration exceeded " << (REAL)cpu_output_states_histogram[1] / n_fits << "\n";
+        // std::cout << "ratio singular hessian       " << (REAL)cpu_output_states_histogram[2] / n_fits << "\n";
+        // std::cout << "ratio neg curvature MLE      " << (REAL)cpu_output_states_histogram[3] / n_fits << "\n";
+        // std::cout << "ratio cpu not read           " << (REAL)cpu_output_states_histogram[4] / n_fits << "\n";
+        
+        // std::cout << "GPU ratio converged          " << (REAL)gpu_output_states_histogram[0] / n_fits << "\n";
+        // std::cout << "ratio max iteration exceeded " << (REAL)gpu_output_states_histogram[1] / n_fits << "\n";
+        // std::cout << "ratio singular hessian       " << (REAL)gpu_output_states_histogram[2] / n_fits << "\n";
+        // std::cout << "ratio neg curvature MLE      " << (REAL)gpu_output_states_histogram[3] / n_fits << "\n";
+        // std::cout << "ratio gpu not read           " << (REAL)gpu_output_states_histogram[4] / n_fits << "\n";
+
+        // compute mean fitted parameters for converged fits
+        std::vector< REAL > cpu_output_parameters_mean(n_parameters, 0);
+        std::vector< REAL > cpu_output_parameters_mean_error(n_parameters, 0);
+        std::vector< REAL > gpu_output_parameters_mean(n_parameters, 0);
+        std::vector< REAL > gpu_output_parameters_mean_error(n_parameters, 0);
+        for (size_t i = 0; i != n_fits; i++)
+        {
+            if (cpufit_states[i] == FitState::CONVERGED)
+            {
+                // add Ktrans
+                cpu_output_parameters_mean[0] += cpufit_parameters[i * n_parameters + 0];
+                // add vp
+                cpu_output_parameters_mean[1] += cpufit_parameters[i * n_parameters + 1];
+                // add Ktrans
+                cpu_output_parameters_mean_error[0] += abs(cpufit_parameters[i * n_parameters + 0]-true_parameters.Ktrans);
+                // add vp
+                cpu_output_parameters_mean_error[1] += abs(cpufit_parameters[i * n_parameters + 1]-true_parameters.vp);
+            }
+
+            if (gpufit_states[i] == FitState::CONVERGED)
+            {
+                // add Ktrans
+                gpu_output_parameters_mean[0] += gpufit_parameters[i * n_parameters + 0];
+                // add vp
+                gpu_output_parameters_mean[1] += gpufit_parameters[i * n_parameters + 1];
+                // add Ktrans
+                gpu_output_parameters_mean_error[0] += abs(gpufit_parameters[i * n_parameters + 0]-true_parameters.Ktrans);
+                // add vp
+                gpu_output_parameters_mean_error[1] += abs(gpufit_parameters[i * n_parameters + 1]-true_parameters.vp);
+            }   
+        }
+        cpu_output_parameters_mean[0] /= cpu_output_states_histogram[0];
+        cpu_output_parameters_mean[1] /= cpu_output_states_histogram[0];
+        gpu_output_parameters_mean[0] /= gpu_output_states_histogram[0];
+        gpu_output_parameters_mean[1] /= gpu_output_states_histogram[0];
+
+        // compute std of fitted parameters for converged fits
+        std::vector< REAL > cpu_output_parameters_std(n_parameters, 0);
+        std::vector< REAL > gpu_output_parameters_std(n_parameters, 0);
+        for (size_t i = 0; i != n_fits; i++)
+        {
+            if (cpufit_states[i] == FitState::CONVERGED)
+            {
+                // add squared deviation for Ktrans
+                cpu_output_parameters_std[0] += (cpufit_parameters[i * n_parameters + 0] - cpu_output_parameters_mean[0]) * (cpufit_parameters[i * n_parameters + 0] - cpu_output_parameters_mean[0]);
+                // add squared deviation for vp
+                cpu_output_parameters_std[1] += (cpufit_parameters[i * n_parameters + 1] - cpu_output_parameters_mean[1]) * (cpufit_parameters[i * n_parameters + 1] - cpu_output_parameters_mean[1]);
+            }
+            if (gpufit_states[i] == FitState::CONVERGED)
+            {
+                // add squared deviation for Ktrans
+                gpu_output_parameters_std[0] += (gpufit_parameters[i * n_parameters + 0] - gpu_output_parameters_mean[0]) * (gpufit_parameters[i * n_parameters + 0] - gpu_output_parameters_mean[0]);
+                // add squared deviation for vp
+                gpu_output_parameters_std[1] += (gpufit_parameters[i * n_parameters + 1] - gpu_output_parameters_mean[1]) * (gpufit_parameters[i * n_parameters + 1] - gpu_output_parameters_mean[1]);
+            }
+
+        }
+        // divide and take square root
+        cpu_output_parameters_std[0] = sqrt(cpu_output_parameters_std[0] / cpu_output_states_histogram[0]);
+        cpu_output_parameters_std[1] = sqrt(cpu_output_parameters_std[1] / cpu_output_states_histogram[0]);
+        gpu_output_parameters_std[0] = sqrt(gpu_output_parameters_std[0] / gpu_output_states_histogram[0]);
+        gpu_output_parameters_std[1] = sqrt(gpu_output_parameters_std[1] / gpu_output_states_histogram[0]);
+
+        // print mean and std
+        // std::cout << "Ktrans  true " << true_parameters[0] << " mean " << output_parameters_mean[0] << " std " << output_parameters_std[0] << "\n";
+        // std::cout << "vp	true " << true_parameters[1] << " mean " << output_parameters_mean[1] << " std " << output_parameters_std[1] << "\n";
+
+        // compute mean chi-square for those converged
+        REAL  cpu_output_chi_square_mean = 0;
+        REAL  gpu_output_chi_square_mean = 0;
+        for (size_t i = 0; i != n_fits; i++)
+        {
+            if (cpufit_states[i] == FitState::CONVERGED)
+            {
+                cpu_output_chi_square_mean += cpufit_chi_squares[i];
+            }
+
+            if (gpufit_states[i] == FitState::CONVERGED)
+                gpu_output_chi_square_mean += gpufit_chi_squares[i];
+        }
+        cpu_output_chi_square_mean /= static_cast<REAL>(cpu_output_states_histogram[0]);
+        gpu_output_chi_square_mean /= static_cast<REAL>(gpu_output_states_histogram[0]);
+        // std::cout << "mean chi square " << cpu_output_chi_square_mean << "\n";
+
+        // compute mean number of iterations for those converged
+        REAL  cpu_output_number_iterations_mean = 0;
+        REAL  gpu_output_number_iterations_mean = 0;
+        for (size_t i = 0; i != n_fits; i++)
+        {
+            if (cpufit_states[i] == FitState::CONVERGED)
+            {
+                cpu_output_number_iterations_mean += static_cast<REAL>(cpufit_n_iterations[i]);
+            }
+
+            if (gpufit_states[i] == FitState::CONVERGED)
+            {
+                gpu_output_number_iterations_mean += static_cast<REAL>(gpufit_n_iterations[i]);
+            }
+        }
+
+        // normalize
+        cpu_output_number_iterations_mean /= static_cast<REAL>(cpu_output_states_histogram[0]);
+        gpu_output_number_iterations_mean /= static_cast<REAL>(gpu_output_states_histogram[0]);
+        // std::cout << "mean number of iterations " << output_number_iterations_mean << "\n";
 
         // print the calculation speed in fits/s
         std::cout << std::fixed << std::setprecision(0);
@@ -402,10 +529,14 @@ int main(int argc, char * argv[])
             std::cout << std::fixed << std::setprecision(2);
             std::cout << std::setw(12) << static_cast<double>(dt_cpufit) / static_cast<double>(dt_gpufit) << std::setw(3) << "|";
             std::cout << std::fixed << std::setprecision(9);
+            // for (int i = 0; i < n_parameters; i++)
+            //     std::cout << std::setw(13) << *(gpufit_parameters.data()+fit_index*n_parameters+i)-*(cpufit_parameters.data()+fit_index*n_parameters+i) << std::setw(3) << "|";
             for (int i = 0; i < n_parameters; i++)
-                std::cout << std::setw(13) << *(gpufit_parameters.data()+fit_index*i)-*(cpufit_parameters.data()+fit_index*i) << std::setw(3) << "|";
-            std::cout << std::setw(13) << *(gpufit_chi_squares.data()+fit_index)-*(cpufit_chi_squares.data()+fit_index) << std::setw(3) << "|";
-            std::cout << std::setw(7) << *(gpufit_n_iterations.data()+fit_index)-*(cpufit_n_iterations.data()+fit_index);
+                std::cout << std::setw(13) << gpu_output_parameters_mean[i]-cpu_output_parameters_mean[i] << " m " << gpu_output_parameters_std[i]-cpu_output_parameters_std[i] << " sd " << std::setw(3) << "|";
+            // std::cout << std::setw(13) << *(gpufit_chi_squares.data()+fit_index)-*(cpufit_chi_squares.data()+fit_index) << std::setw(3) << "|";
+            // std::cout << std::setw(7) << *(gpufit_n_iterations.data()+fit_index)-*(cpufit_n_iterations.data()+fit_index);
+            std::cout << std::setw(13) << gpu_output_chi_square_mean-cpu_output_chi_square_mean << std::setw(3) << "|";
+            std::cout << std::setw(7) << gpu_output_number_iterations_mean-cpu_output_number_iterations_mean;
         }
         else if (!do_gpufits)
         {
@@ -418,9 +549,9 @@ int main(int argc, char * argv[])
             std::cout << std::setw(12) << "inf" << std::setw(3) << "|";
             std::cout << std::fixed << std::setprecision(9);
             for (int i = 0; i < n_parameters; i++)
-                std::cout << std::setw(13) << *(gpufit_parameters.data()+fit_index*i)-*(cpufit_parameters.data()+fit_index*i) << std::setw(3) << "|";
-            std::cout << std::setw(13) << *(gpufit_chi_squares.data()+fit_index)-*(cpufit_chi_squares.data()+fit_index) << std::setw(3) << "|";
-            std::cout << std::setw(7) << *(gpufit_n_iterations.data()+fit_index)-*(cpufit_n_iterations.data()+fit_index);
+                std::cout << std::setw(13) << gpu_output_parameters_mean[i]-cpu_output_parameters_mean[i] << " m " << gpu_output_parameters_std[i]-cpu_output_parameters_std[i] << " sd " << std::setw(3) << "|";
+            std::cout << std::setw(13) << gpu_output_chi_square_mean-cpu_output_chi_square_mean << std::setw(3) << "|";
+            std::cout << std::setw(7) << gpu_output_number_iterations_mean-cpu_output_number_iterations_mean;
         }
         
         std::cout << std::endl;        

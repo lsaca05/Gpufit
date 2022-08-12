@@ -1662,7 +1662,7 @@ void LMFitCPP::project_parameters_to_box()
             continue;
 		
 		int const constraint_type = constraint_types_[parameter_index];
-        float& parameter = parameters_[parameter_index];
+        REAL& parameter = parameters_[parameter_index];
 		
 		if( constraint_type == ConstraintType::LOWER || constraint_type == ConstraintType::LOWER_UPPER )
 		{

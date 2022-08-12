@@ -123,7 +123,7 @@ void liver_fat_three()
 		for (int h =0; h < 7; h++)
 		{
 			// weight_list * e ^ (j * 2 * pi * ppm_list * TEn)
-			C_n += weight_list[h] * pow(expC, (j * 2.0f * piC * ppm_list[h] * TEnC[k]));
+			C_n += weight_list[h] * pow(expC, (j * (REAL)2.0 * piC * ppm_list[h] * TEnC[k]));
 		}
 
 		REAL x = user_info[k];
@@ -381,7 +381,7 @@ void liver_fat_four()
 		for (int h =0; h < 7; h++)
 		{
 			// weight_list * e ^ (j * 2 * pi * ppm_list * TEn)
-			C_n += weight_list[h] * pow(expC, (j * 2.0f * piC * ppm_list[h] * TEnC[k]));
+			C_n += weight_list[h] * pow(expC, (j * (REAL)2.0 * piC * ppm_list[h] * TEnC[k]));
 		}
 
 		REAL x = user_info[k];
